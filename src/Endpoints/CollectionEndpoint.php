@@ -5,6 +5,7 @@ namespace Voyanara\MilvusSdk\Endpoints;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 use Voyanara\MilvusSdk\Requests\Collection\AddFieldRequest;
+use Voyanara\MilvusSdk\Requests\Collection\AlterCollectionPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
@@ -203,6 +204,40 @@ class CollectionEndpoint extends BaseResource
     {
         return $this->connector->send(new DescribeCollectionRequest(
             collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Alter Collection Properties - This operation alters the properties of a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param array $properties The properties of the collection to alter
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Properties structure:
+     * [
+     *     'mmmap.enabled' => true,                    // boolean - Whether to enable memory-mapped feature for the collection
+     *     'collection.ttl.seconds' => 3600,          // integer - Time-to-live (TTL) of the collection in seconds
+     *     'partitionkey.isolation' => true           // boolean - Whether to enable partition key isolation for the collection
+     * ]
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function alterCollectionProperties(
+        string $collectionName,
+        array $properties,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new AlterCollectionPropertiesRequest(
+            collectionName: $collectionName,
+            properties: $properties,
             dbName: $dbName
         ));
     }

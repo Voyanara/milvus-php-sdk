@@ -174,4 +174,39 @@ class CollectionTest extends OrchestraTestCase
         
         Milvus::collection()->dropCollection($collectionName);
     }
+
+    public function test_alter_collection_properties(): void
+    {
+        $collectionName = 'test_alter_collection_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        Milvus::collection()->createCollection($collectionName, $schema);
+        
+        $properties = [
+            'mmmap.enabled' => true
+        ];
+        
+        $response = Milvus::collection()->alterCollectionProperties($collectionName, $properties);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+//        Milvus::collection()->dropCollection($collectionName);
+    }
 }
