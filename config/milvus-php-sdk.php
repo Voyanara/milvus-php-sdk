@@ -3,16 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Milvus SDK Configuration
+    | Milvus PHP SDK Configuration
     |--------------------------------------------------------------------------
     |
-    | This configuration file is for interfacing with the Milvus REST API using
-    | the Milvus SDK. Authentication can be achieved either through an API token
-    | or via a combination of username and password. The API token is the preferred
-    | method, and if provided, username and password are not required.
+    | This configuration file is for interfacing with the Milvus vector database
+    | API v2 using the Milvus PHP SDK. Authentication is achieved through an API
+    | token which can be either a simple token or username:password combination.
     |
-    | 'host' and 'port' settings determine the connection details for the
-    | Milvus REST API, with default values set to 'localhost' and '19530',
+    | For local development with Docker: use 'root:Milvus' as the token
+    | For Zilliz Cloud: use 'db_randomstring:your_password' format
+    |
+    | The 'host' should include the protocol (http/https) and 'port' determines
+    | the connection port, with defaults set for local development.
     |
     */
 
