@@ -42,6 +42,23 @@ php artisan milvus-php-sdk:install
 
 This command will publish the configuration file to `config/milvus-php-sdk.php` where you can set your Milvus connection parameters.
 
+#### Configuration
+
+Add the following environment variables to your `.env` file:
+
+```env
+# For local development with Docker
+MILVUS_TOKEN=root:Milvus
+MILVUS_HOST=http://localhost
+MILVUS_PORT=19530
+
+# For Zilliz Cloud (hosted Milvus)
+MILVUS_TOKEN=db_randomstring:your_password
+MILVUS_HOST=https://in03.serverless.gcp-us-west1.cloud.zilliz.com
+MILVUS_PORT=443
+```
+
+
 ## Roadmap
 
 ### ✅ Implemented Features
@@ -100,4 +117,52 @@ $milvus = new Milvus(
 
 // Now you can use all SDK features with Zilliz Cloud
 $collections = $milvus->collection()->list();
+```
+
+### Using with Laravel
+
+Once configured, you can use the Milvus facade throughout your Laravel application:
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Facades\Milvus;
+
+// User management
+$users = Milvus::user()->list();
+$user = Milvus::user()->describe('username');
+
+// Role management  
+$roles = Milvus::role()->list();
+$role = Milvus::role()->describe('role_name');
+
+// Collection management
+$collections = Milvus::collection()->list();
+$collection = Milvus::collection()->describe('collection_name');
+
+// Create a new collection with schema and index
+$schema = [
+    'fields' => [
+        [
+            'fieldName' => 'id',
+            'dataType' => 'Int64', 
+            'isPrimary' => true
+        ],
+        [
+            'fieldName' => 'vector',
+            'dataType' => 'FloatVector',
+            'elementTypeParams' => ['dim' => '128']
+        ]
+    ]
+];
+
+$indexParams = [
+    [
+        'fieldName' => 'vector',
+        'indexName' => 'vector_index', 
+        'metricType' => 'L2'
+    ]
+];
+
+Milvus::collection()->createCollection('my_collection', $schema, $indexParams);
 ```
