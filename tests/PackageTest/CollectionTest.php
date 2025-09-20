@@ -217,4 +217,35 @@ class CollectionTest extends TestCase
         
         $this->milvus->collection()->dropCollection($collectionName);
     }
+
+    public function test_compact_collection(): void
+    {
+        $collectionName = 'test_compact_collection_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema);
+        
+        $response = $this->milvus->collection()->compactCollection($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        $this->milvus->collection()->dropCollection($collectionName);
+    }
 }

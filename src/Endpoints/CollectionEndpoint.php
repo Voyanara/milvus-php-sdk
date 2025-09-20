@@ -7,6 +7,7 @@ use Saloon\Http\Response;
 use Voyanara\MilvusSdk\Requests\Collection\AddFieldRequest;
 use Voyanara\MilvusSdk\Requests\Collection\AlterCollectionPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
+use Voyanara\MilvusSdk\Requests\Collection\CompactCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
@@ -239,6 +240,27 @@ class CollectionEndpoint extends BaseResource
             collectionName: $collectionName,
             properties: $properties,
             dbName: $dbName
+        ));
+    }
+
+    /**
+     * Compact Collection - This operation compacts the collection by merging small segments into larger ones.
+     * It is recommended to call this operation after inserting a large amount of data into a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "cost": 0,
+     *     "data": {}
+     * }
+     */
+    public function compactCollection(string $collectionName): Response
+    {
+        return $this->connector->send(new CompactCollectionRequest(
+            collectionName: $collectionName
         ));
     }
 }
