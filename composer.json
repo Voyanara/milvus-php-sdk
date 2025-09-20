@@ -1,0 +1,42 @@
+{
+  "name": "voyanara/milvus-php-sdk",
+  "description": "A modern, type-safe PHP SDK for Milvus vector database. This library provides a clean, intuitive interface for managing collections, users, roles, and privileges in Milvus through its REST API.",
+  "keywords": [
+    "milvus",
+    "vector database",
+    "sdk",
+    "php",
+    "laravel",
+    "vector search",
+    "embeddings",
+    "similarity search",
+    "ai",
+    "machine learning"
+  ],
+  "type": "library",
+  "require": {
+    "php": "^8.1",
+    "saloonphp/saloon": "^3.14"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "12.0"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Voyanara\\MilvusSdk\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Voyanara\\MilvusSdk\\Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Kitsen Artem"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
