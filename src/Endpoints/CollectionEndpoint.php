@@ -5,9 +5,22 @@ namespace Voyanara\MilvusSdk\Endpoints;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 use Voyanara\MilvusSdk\Requests\Collection\AddFieldRequest;
+use Voyanara\MilvusSdk\Requests\Collection\AlterCollectionPropertiesRequest;
+use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
+use Voyanara\MilvusSdk\Requests\Collection\CompactCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\DropCollectionPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
-use Voyanara\MilvusSdk\Requests\Role\ListRequest;
+use Voyanara\MilvusSdk\Requests\Collection\FlushCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\GetCollectionLoadStateRequest;
+use Voyanara\MilvusSdk\Requests\Collection\GetCollectionStatsRequest;
+use Voyanara\MilvusSdk\Requests\Collection\HasCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\ListCollectionsRequest;
+use Voyanara\MilvusSdk\Requests\Collection\LoadCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\RefreshLoadRequest;
+use Voyanara\MilvusSdk\Requests\Collection\ReleaseCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\RenameCollectionRequest;
 
 class CollectionEndpoint extends BaseResource
 {
@@ -122,6 +135,388 @@ class CollectionEndpoint extends BaseResource
             collectionName: $collectionName,
             schema: $schema,
             dbName: $dbName
+        ));
+    }
+
+    /**
+     * Alter Field Properties - This operation alters the properties of a field in a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string $fieldName The name of the field whose properties are to be altered
+     * @param array $fieldParams The properties of the field to alter
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Field parameters structure:
+     * [
+     *     'max_length' => 100,    // integer - The maximum length of the field (applies only to VarChar type)
+     *     'max_capacity' => 50    // integer - The maximum capacity of the field (applies only to Array type)
+     * ]
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function alterFieldProperties(
+        string $collectionName,
+        string $fieldName,
+        array $fieldParams,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new AlterFieldPropertiesRequest(
+            collectionName: $collectionName,
+            fieldName: $fieldName,
+            fieldParams: $fieldParams,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Describe Collection - Describes the details of a collection.
+     *
+     * @param string $collectionName The name of the collection to describe
+     * @param string|null $dbName The name of the database (optional, defaults to null)
+     * @return Response A success response with detailed collection information including aliases, fields, indexes, and properties
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "aliases": [],
+     *         "autoId": false,
+     *         "collectionID": 448707763883002000,
+     *         "collectionName": "test_collection",
+     *         "consistencyLevel": "Bounded",
+     *         "description": "",
+     *         "enableDynamicField": true,
+     *         "fields": [
+     *             {
+     *                 "autoId": false,
+     *                 "description": "",
+     *                 "id": 100,
+     *                 "name": "id",
+     *                 "partitionKey": false,
+     *                 "primaryKey": true,
+     *                 "type": "Int64"
+     *             }
+     *         ],
+     *         "indexes": [],
+     *         "load": "LoadStateLoaded",
+     *         "partitionsNum": 1,
+     *         "properties": [],
+     *         "shardsNum": 1
+     *     }
+     * }
+     */
+    public function describeCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new DescribeCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Alter Collection Properties - This operation alters the properties of a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param array $properties The properties of the collection to alter
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Properties structure:
+     * [
+     *     'mmmap.enabled' => true,                    // boolean - Whether to enable memory-mapped feature for the collection
+     *     'collection.ttl.seconds' => 3600,          // integer - Time-to-live (TTL) of the collection in seconds
+     *     'partitionkey.isolation' => true           // boolean - Whether to enable partition key isolation for the collection
+     * ]
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function alterCollectionProperties(
+        string $collectionName,
+        array $properties,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new AlterCollectionPropertiesRequest(
+            collectionName: $collectionName,
+            properties: $properties,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Compact Collection - This operation compacts the collection by merging small segments into larger ones.
+     * It is recommended to call this operation after inserting a large amount of data into a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "cost": 0,
+     *     "data": {}
+     * }
+     */
+    public function compactCollection(string $collectionName): Response
+    {
+        return $this->connector->send(new CompactCollectionRequest(
+            collectionName: $collectionName
+        ));
+    }
+
+    /**
+     * Drop Collection Properties - This operation drops the properties of a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param array $propertyKeys The names of the properties to drop
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Property keys example:
+     * ['mmap.enabled', 'collection.ttl.seconds', 'partitionkey.isolation']
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "cost": 0,
+     *     "data": {}
+     * }
+     */
+    public function dropCollectionProperties(
+        string $collectionName,
+        array $propertyKeys,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new DropCollectionPropertiesRequest(
+            collectionName: $collectionName,
+            propertyKeys: $propertyKeys,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Flush Collection - This operation flushes the streaming data and seals segments.
+     * It is recommended to call this operation after all the data has been inserted into a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database that to which the collection belongs. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function flushCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new FlushCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Get Collection Load State - This operation returns the load status of a specific collection.
+     *
+     * @param string $collectionName The name of a collection
+     * @param string|null $dbName The name of a database to which the collection belongs (optional, defaults to null)
+     * @param string|null $partitionNames A list of partition names. If any partition names are specified, releasing any of these partitions results in the return of a NotLoad state (optional, defaults to null)
+     * @return Response A success response with load state information including loadState, loadProgress, and message
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "loadProgress": 100,
+     *         "loadState": "LoadStateLoaded",
+     *         "message": ""
+     *     }
+     * }
+     */
+    public function getCollectionLoadState(
+        string $collectionName,
+        ?string $dbName = null,
+        ?string $partitionNames = null
+    ): Response
+    {
+        return $this->connector->send(new GetCollectionLoadStateRequest(
+            collectionName: $collectionName,
+            dbName: $dbName,
+            partitionNames: $partitionNames
+        ));
+    }
+
+    /**
+     * Get Collection Stats - This operation gets the number of entities in a collection.
+     *
+     * @param string $collectionName The name of the collection to check. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with collection statistics including rowCount
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "rowCount": 0
+     *     }
+     * }
+     */
+    public function getCollectionStats(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new GetCollectionStatsRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Has Collection - This operation checks whether a collection exists.
+     *
+     * @param string $collectionName The name of an existing collection
+     * @param string|null $dbName The name of the database in which to check the existence of a collection (optional, defaults to null)
+     * @return Response A success response with a boolean value indicating whether the collection exists
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "has": true
+     *     }
+     * }
+     */
+    public function hasCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new HasCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * List Collections - This operation lists all collection names.
+     *
+     * @param string|null $dbName The name of an existing database (optional, defaults to null)
+     * @return Response A success response with a list of collection names
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": [
+     *         "quick_setup_new",
+     *         "customized_setup_1",
+     *         "customized_setup_2"
+     *     ]
+     * }
+     */
+    public function listCollections(?string $dbName = null): Response
+    {
+        return $this->connector->send(new ListCollectionsRequest(
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Load Collection - This operation loads the data of the current collection into memory.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database that to which the collection belongs. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function loadCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new LoadCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Refresh Load - This operation refreshes the load of a collection.
+     *
+     * @param string $collectionName The name of the collection to refresh. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function refreshLoad(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new RefreshLoadRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Release Collection - This operation releases the data of the current collection from memory.
+     *
+     * @param string $collectionName The name of the target collection
+     * @param string|null $dbName The name of the database to which the collection belongs (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function releaseCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new ReleaseCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Rename Collection - This operation renames an existing collection and optionally moves the collection to a new database.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string $newCollectionName The name of the target collection after this operation. Setting this to the value of oldcollectionname results in an error
+     * @param string|null $dbName The name of the database that to which the collection belongs. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @param string|null $newDbName The name of the database to which the collection belongs after this operation. The value defaults to default. Setting this to a database rather than the one the collection belongs to before this operation moves this collection to the specified database. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function renameCollection(
+        string $collectionName,
+        string $newCollectionName,
+        ?string $dbName = null,
+        ?string $newDbName = null
+    ): Response
+    {
+        return $this->connector->send(new RenameCollectionRequest(
+            collectionName: $collectionName,
+            newCollectionName: $newCollectionName,
+            dbName: $dbName,
+            newDbName: $newDbName
         ));
     }
 }
