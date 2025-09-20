@@ -7,6 +7,7 @@ use Saloon\Http\Response;
 use Voyanara\MilvusSdk\Requests\Collection\AddFieldRequest;
 use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
 
 class CollectionEndpoint extends BaseResource
@@ -157,6 +158,51 @@ class CollectionEndpoint extends BaseResource
             collectionName: $collectionName,
             fieldName: $fieldName,
             fieldParams: $fieldParams,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Describe Collection - Describes the details of a collection.
+     *
+     * @param string $collectionName The name of the collection to describe
+     * @param string|null $dbName The name of the database (optional, defaults to null)
+     * @return Response A success response with detailed collection information including aliases, fields, indexes, and properties
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "aliases": [],
+     *         "autoId": false,
+     *         "collectionID": 448707763883002000,
+     *         "collectionName": "test_collection",
+     *         "consistencyLevel": "Bounded",
+     *         "description": "",
+     *         "enableDynamicField": true,
+     *         "fields": [
+     *             {
+     *                 "autoId": false,
+     *                 "description": "",
+     *                 "id": 100,
+     *                 "name": "id",
+     *                 "partitionKey": false,
+     *                 "primaryKey": true,
+     *                 "type": "Int64"
+     *             }
+     *         ],
+     *         "indexes": [],
+     *         "load": "LoadStateLoaded",
+     *         "partitionsNum": 1,
+     *         "properties": [],
+     *         "shardsNum": 1
+     *     }
+     * }
+     */
+    public function describeCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new DescribeCollectionRequest(
+            collectionName: $collectionName,
             dbName: $dbName
         ));
     }
