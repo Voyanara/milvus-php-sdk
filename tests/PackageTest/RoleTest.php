@@ -1,6 +1,6 @@
 <?php
 
-namespace Voyanara\MilvusSdk\Tests\Unit;
+namespace Voyanara\MilvusSdk\Tests\PackageTest;
 
 use Voyanara\MilvusSdk\Enums\Privilege;
 use Voyanara\MilvusSdk\Milvus;
