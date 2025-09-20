@@ -1,0 +1,72 @@
+<?php
+
+namespace Voyanara\MilvusSdk\Enums;
+
+enum Privilege: string
+{
+    case CollectionReadOnly = 'CollectionReadOnly';
+    case CollectionReadWrite = 'CollectionReadWrite';
+    case CollectionAdmin = 'CollectionAdmin';
+    case DatabaseReadOnly = 'DatabaseReadOnly';
+    case DatabaseReadWrite = 'DatabaseReadWrite';
+    case DatabaseAdmin = 'DatabaseAdmin';
+    case ClusterReadOnly = 'ClusterReadOnly';
+    case ClusterReadWrite = 'ClusterReadWrite';
+    case ClusterAdmin = 'ClusterAdmin';
+    case Query = 'Query';
+    case Search = 'Search';
+    case IndexDetail = 'IndexDetail';
+    case GetFlushState = 'GetFlushState';
+    case GetLoadState = 'GetLoadState';
+    case GetLoadingProgress = 'GetLoadingProgress';
+    case HasPartition = 'HasPartition';
+    case ShowPartitions = 'ShowPartitions';
+    case ListAliases = 'ListAliases';
+    case DescribeCollection = 'DescribeCollection';
+    case DescribeAlias = 'DescribeAlias';
+    case ShowCollections = 'ShowCollections';
+    case DescribeDatabase = 'DescribeDatabase';
+    case ListDatabases = 'ListDatabases';
+    case GetStatistics = 'GetStatistics';
+    case CreateIndex = 'CreateIndex';
+    case DropIndex = 'DropIndex';
+    case CreateCollection = 'CreateCollection';
+    case DropCollection = 'DropCollection';
+    case RenameCollection = 'RenameCollection';
+    case CreatePartition = 'CreatePartition';
+    case DropPartition = 'DropPartition';
+    case AlterDatabase = 'AlterDatabase';
+    case Load = 'Load';
+    case Release = 'Release';
+    case Insert = 'Insert';
+    case Delete = 'Delete';
+    case Upsert = 'Upsert';
+    case Import = 'Import';
+    case Flush = 'Flush';
+    case Compaction = 'Compaction';
+    case LoadBalance = 'LoadBalance';
+    case CreateAlias = 'CreateAlias';
+    case DropAlias = 'DropAlias';
+    case CreateOwnership = 'CreateOwnership';
+    case DropOwnership = 'DropOwnership';
+    case SelectOwnership = 'SelectOwnership';
+    case ManageOwnership = 'ManageOwnership';
+    case UpdateUser = 'UpdateUser';
+    case SelectUser = 'SelectUser';
+    case BackupRBAC = 'BackupRBAC';
+    case RestoreRBAC = 'RestoreRBAC';
+    case CreateResourceGroup = 'CreateResourceGroup';
+    case DropResourceGroup = 'DropResourceGroup';
+    case UpdateResourceGroups = 'UpdateResourceGroups';
+    case DescribeResourceGroup = 'DescribeResourceGroup';
+    case ListResourceGroups = 'ListResourceGroups';
+    case TransferNode = 'TransferNode';
+    case TransferReplica = 'TransferReplica';
+    case CreateDatabase = 'CreateDatabase';
+    case DropDatabase = 'DropDatabase';
+    case FlushAll = 'FlushAll';
+    case CreatePrivilegeGroup = 'CreatePrivilegeGroup';
+    case DropPrivilegeGroup = 'DropPrivilegeGroup';
+    case ListPrivilegeGroups = 'ListPrivilegeGroups';
+    case OperatePrivilegeGroup = 'OperatePrivilegeGroup';
+}
