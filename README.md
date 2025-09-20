@@ -15,6 +15,7 @@ Perfect for applications requiring vector similarity search, AI/ML workflows, an
 
 - PHP 8.1 or higher
 - Milvus 2.6.x (or compatible versions)
+- Laravel 10.x, 11.x, 12.x (for Laravel integration)
 
 ## Versions
 
