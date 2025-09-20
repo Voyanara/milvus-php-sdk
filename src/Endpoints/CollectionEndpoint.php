@@ -10,7 +10,9 @@ use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CompactCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\DropCollectionPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\FlushCollectionRequest;
 
 class CollectionEndpoint extends BaseResource
 {
@@ -261,6 +263,59 @@ class CollectionEndpoint extends BaseResource
     {
         return $this->connector->send(new CompactCollectionRequest(
             collectionName: $collectionName
+        ));
+    }
+
+    /**
+     * Drop Collection Properties - This operation drops the properties of a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param array $propertyKeys The names of the properties to drop
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Property keys example:
+     * ['mmap.enabled', 'collection.ttl.seconds', 'partitionkey.isolation']
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "cost": 0,
+     *     "data": {}
+     * }
+     */
+    public function dropCollectionProperties(
+        string $collectionName,
+        array $propertyKeys,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new DropCollectionPropertiesRequest(
+            collectionName: $collectionName,
+            propertyKeys: $propertyKeys,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Flush Collection - This operation flushes the streaming data and seals segments.
+     * It is recommended to call this operation after all the data has been inserted into a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database that to which the collection belongs. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function flushCollection(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new FlushCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
         ));
     }
 }

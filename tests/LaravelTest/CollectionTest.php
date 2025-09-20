@@ -240,4 +240,72 @@ class CollectionTest extends OrchestraTestCase
         
 //        Milvus::collection()->dropCollection($collectionName);
     }
+
+    public function test_drop_collection_properties(): void
+    {
+        $collectionName = 'test_drop_properties_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        Milvus::collection()->createCollection($collectionName, $schema);
+        
+        // First set a property
+        $properties = ['mmmap.enabled' => true];
+        Milvus::collection()->alterCollectionProperties($collectionName, $properties);
+        
+        // Then drop it
+        $propertyKeys = ['mmmap.enabled'];
+        $response = Milvus::collection()->dropCollectionProperties($collectionName, $propertyKeys);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        Milvus::collection()->dropCollection($collectionName);
+    }
+
+    public function test_flush_collection(): void
+    {
+        $collectionName = 'test_flush_collection_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        Milvus::collection()->createCollection($collectionName, $schema);
+        
+        $response = Milvus::collection()->flushCollection($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        Milvus::collection()->dropCollection($collectionName);
+    }
 }
