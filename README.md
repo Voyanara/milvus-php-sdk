@@ -31,6 +31,16 @@ You can install the package via Composer:
 composer require voyanara/milvus-php-sdk
 ```
 
+### Docker Development Environment
+
+For development and testing, you can quickly spin up a Milvus instance using the included Docker Compose configuration:
+
+```bash
+docker-compose up -d
+```
+
+This will start Milvus with all necessary dependencies (etcd, MinIO) and expose it on the default port 19530.
+
 ### Laravel Integration
 
 This package includes Laravel service provider for seamless integration:
@@ -48,10 +58,10 @@ This command will publish the configuration file to `config/milvus-php-sdk.php` 
 
 - **User Management** - Complete user operations (create, describe, drop, list, update password)
 - **Role Management** - Full role-based access control (create, drop, describe, list, grant/revoke privileges)
+- **Collection Management** - Complete collection operations and schema management (create, drop, describe, list, load, release, rename, etc.)
 
 ### 🚧 In Development
 
-- **Collection Management** - Collection operations and schema management
 - **Vector Operations** - Insert, search, query, update, and delete vector data
 
 ### 📋 Planned Features
