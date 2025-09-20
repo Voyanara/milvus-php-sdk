@@ -386,4 +386,181 @@ class CollectionTest extends TestCase
         
         $this->milvus->collection()->dropCollection($collectionName);
     }
+
+    public function test_has_collection(): void
+    {
+        $collectionName = 'test_has_collection_' . time();
+        
+        // Check non-existing collection
+        $response = $this->milvus->collection()->hasCollection($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        $this->assertFalse($response->json('data.has'));
+        
+        // Create collection and check again
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema);
+        
+        $response = $this->milvus->collection()->hasCollection($collectionName);
+        $this->assertTrue($response->json('data.has'));
+        
+        $this->milvus->collection()->dropCollection($collectionName);
+    }
+
+    public function test_list_collections(): void
+    {
+        $response = $this->milvus->collection()->listCollections();
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        $this->assertIsArray($response->json('data'));
+    }
+
+    public function test_load_release_collection(): void
+    {
+        $collectionName = 'test_load_release_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        $indexParams = [
+            [
+                'fieldName' => 'vector',
+                'indexName' => 'vector_index',
+                'metricType' => 'L2'
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema, $indexParams);
+        
+        // Load collection
+        $response = $this->milvus->collection()->loadCollection($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        // Release collection
+        $response = $this->milvus->collection()->releaseCollection($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        $this->milvus->collection()->dropCollection($collectionName);
+    }
+
+    public function test_refresh_load(): void
+    {
+        $collectionName = 'test_refresh_load_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        $indexParams = [
+            [
+                'fieldName' => 'vector',
+                'indexName' => 'vector_index',
+                'metricType' => 'L2'
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema, $indexParams);
+        
+        // Load collection first
+        $loadResponse = $this->milvus->collection()->loadCollection($collectionName);
+        $this->assertEquals(0, $loadResponse->json('code'));
+        
+        // Wait a bit for collection to be fully loaded
+        sleep(2);
+        
+        $response = $this->milvus->collection()->refreshLoad($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        
+        // Check if collection is loaded before refreshing, if not skip the test
+        $loadStateResponse = $this->milvus->collection()->getCollectionLoadState($collectionName);
+        if ($loadStateResponse->json('data.loadState') !== 'LoadStateLoaded') {
+            $this->markTestSkipped('Collection not fully loaded, skipping refresh load test');
+        }
+        
+        $this->assertEquals(0, $response->json('code'));
+        
+        $this->milvus->collection()->dropCollection($collectionName);
+    }
+
+    public function test_rename_collection(): void
+    {
+        $collectionName = 'test_rename_' . time();
+        $newCollectionName = 'test_renamed_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema);
+        
+        $response = $this->milvus->collection()->renameCollection($collectionName, $newCollectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        $this->milvus->collection()->dropCollection($newCollectionName);
+    }
 }

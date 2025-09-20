@@ -28,6 +28,7 @@ class RoleTest extends TestCase
         $roleName = 'test_role_' . time();
         
         $response = $this->milvus->role()->createRole($roleName);
+        var_dump($response->body());
         $this->assertIsArray($response->json());
         $this->assertEquals(0, $response->json('code'));
         
