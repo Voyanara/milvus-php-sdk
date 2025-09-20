@@ -16,7 +16,8 @@
   "type": "library",
   "require": {
     "php": "^8.1",
-    "saloonphp/saloon": "^3.14"
+    "saloonphp/saloon": "^3.14",
+    "spatie/laravel-package-tools": "^1.92"
   },
   "license": "MIT",
   "autoload": {
@@ -37,6 +38,17 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require-dev": {
-    "phpunit/phpunit": "^10.0 || ^11.0 || ^12.0"
+    "phpunit/phpunit": "^10.0 || ^11.0 || ^12.0",
+    "orchestra/testbench": "^10.6"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Voyanara\\MilvusSdk\\ServiceProvider"
+      ],
+      "aliases": {
+        "Milvus": "Voyanara\\MilvusSdk\\Facades\\Milvus"
+      }
+    }
   }
 }

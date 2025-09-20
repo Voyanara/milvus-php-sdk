@@ -50,3 +50,42 @@ composer require voyanara/milvus-php-sdk
 - **Index Management** - Vector index creation and optimization
 - **Partition Management** - Data partitioning for better performance
 - **Resource Group** - Resource allocation and management
+
+## Quick Start
+
+### Basic Usage
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Milvus;
+
+// Initialize the client
+$milvus = new Milvus(
+    token: 'your_token_here',
+    host: 'http://localhost',
+    port: '19530'
+);
+
+// Example: List all users
+$users = $milvus->user()->list();
+```
+
+### Using with Zilliz Cloud
+
+For Zilliz Cloud (hosted Milvus), configure the client with your cloud credentials:
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Milvus;
+
+$milvus = new Milvus(
+    token: "db_randomstring:your_password",
+    host: 'https://in03.serverless.gcp-us-west1.cloud.zilliz.com',
+    port: '443'
+);
+
+// Now you can use all SDK features with Zilliz Cloud
+$collections = $milvus->collection()->list();
+```
