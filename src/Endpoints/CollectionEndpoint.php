@@ -5,9 +5,9 @@ namespace Voyanara\MilvusSdk\Endpoints;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 use Voyanara\MilvusSdk\Requests\Collection\AddFieldRequest;
+use Voyanara\MilvusSdk\Requests\Collection\AlterFieldPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\CreateCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
-use Voyanara\MilvusSdk\Requests\Role\ListRequest;
 
 class CollectionEndpoint extends BaseResource
 {
@@ -121,6 +121,42 @@ class CollectionEndpoint extends BaseResource
         return $this->connector->send(new AddFieldRequest(
             collectionName: $collectionName,
             schema: $schema,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Alter Field Properties - This operation alters the properties of a field in a collection.
+     *
+     * @param string $collectionName The name of the target collection. Setting this to a non-existing collection results in an error
+     * @param string $fieldName The name of the field whose properties are to be altered
+     * @param array $fieldParams The properties of the field to alter
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with response code and empty data object
+     * 
+     * Field parameters structure:
+     * [
+     *     'max_length' => 100,    // integer - The maximum length of the field (applies only to VarChar type)
+     *     'max_capacity' => 50    // integer - The maximum capacity of the field (applies only to Array type)
+     * ]
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {}
+     * }
+     */
+    public function alterFieldProperties(
+        string $collectionName,
+        string $fieldName,
+        array $fieldParams,
+        ?string $dbName = null
+    ): Response
+    {
+        return $this->connector->send(new AlterFieldPropertiesRequest(
+            collectionName: $collectionName,
+            fieldName: $fieldName,
+            fieldParams: $fieldParams,
             dbName: $dbName
         ));
     }

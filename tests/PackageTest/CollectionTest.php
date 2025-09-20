@@ -107,4 +107,46 @@ class CollectionTest extends TestCase
         
         $this->milvus->collection()->dropCollection($collectionName);
     }
+
+    public function test_alter_field_properties(): void
+    {
+        $collectionName = 'test_alter_field_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ],
+                [
+                    'fieldName' => 'my_varchar',
+                    'dataType' => 'VarChar',
+                    'elementTypeParams' => [
+                        'max_length' => 50
+                    ]
+                ]
+            ]
+        ];
+        
+        $this->milvus->collection()->createCollection($collectionName, $schema);
+        
+        $fieldParams = [
+            'max_length' => 100
+        ];
+        
+        $response = $this->milvus->collection()->alterFieldProperties($collectionName, 'my_varchar', $fieldParams);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        
+        $this->milvus->collection()->dropCollection($collectionName);
+    }
 }
