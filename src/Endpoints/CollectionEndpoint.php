@@ -13,6 +13,8 @@ use Voyanara\MilvusSdk\Requests\Collection\DescribeCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionPropertiesRequest;
 use Voyanara\MilvusSdk\Requests\Collection\DropCollectionRequest;
 use Voyanara\MilvusSdk\Requests\Collection\FlushCollectionRequest;
+use Voyanara\MilvusSdk\Requests\Collection\GetCollectionLoadStateRequest;
+use Voyanara\MilvusSdk\Requests\Collection\GetCollectionStatsRequest;
 
 class CollectionEndpoint extends BaseResource
 {
@@ -314,6 +316,60 @@ class CollectionEndpoint extends BaseResource
     public function flushCollection(string $collectionName, ?string $dbName = null): Response
     {
         return $this->connector->send(new FlushCollectionRequest(
+            collectionName: $collectionName,
+            dbName: $dbName
+        ));
+    }
+
+    /**
+     * Get Collection Load State - This operation returns the load status of a specific collection.
+     *
+     * @param string $collectionName The name of a collection
+     * @param string|null $dbName The name of a database to which the collection belongs (optional, defaults to null)
+     * @param string|null $partitionNames A list of partition names. If any partition names are specified, releasing any of these partitions results in the return of a NotLoad state (optional, defaults to null)
+     * @return Response A success response with load state information including loadState, loadProgress, and message
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "loadProgress": 100,
+     *         "loadState": "LoadStateLoaded",
+     *         "message": ""
+     *     }
+     * }
+     */
+    public function getCollectionLoadState(
+        string $collectionName,
+        ?string $dbName = null,
+        ?string $partitionNames = null
+    ): Response
+    {
+        return $this->connector->send(new GetCollectionLoadStateRequest(
+            collectionName: $collectionName,
+            dbName: $dbName,
+            partitionNames: $partitionNames
+        ));
+    }
+
+    /**
+     * Get Collection Stats - This operation gets the number of entities in a collection.
+     *
+     * @param string $collectionName The name of the collection to check. Setting this to a non-existing collection results in an error
+     * @param string|null $dbName The name of the database which the collection belongs to. Setting this to a non-existing database results in an error (optional, defaults to null)
+     * @return Response A success response with collection statistics including rowCount
+     * 
+     * Example response:
+     * {
+     *     "code": 0,
+     *     "data": {
+     *         "rowCount": 0
+     *     }
+     * }
+     */
+    public function getCollectionStats(string $collectionName, ?string $dbName = null): Response
+    {
+        return $this->connector->send(new GetCollectionStatsRequest(
             collectionName: $collectionName,
             dbName: $dbName
         ));

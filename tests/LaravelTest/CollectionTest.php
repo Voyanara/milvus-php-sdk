@@ -308,4 +308,70 @@ class CollectionTest extends OrchestraTestCase
         
         Milvus::collection()->dropCollection($collectionName);
     }
+
+    public function test_get_collection_load_state(): void
+    {
+        $collectionName = 'test_load_state_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        Milvus::collection()->createCollection($collectionName, $schema);
+        
+        $response = Milvus::collection()->getCollectionLoadState($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        $this->assertArrayHasKey('loadState', $response->json('data'));
+        $this->assertArrayHasKey('loadProgress', $response->json('data'));
+        
+        Milvus::collection()->dropCollection($collectionName);
+    }
+
+    public function test_get_collection_stats(): void
+    {
+        $collectionName = 'test_stats_' . time();
+        
+        $schema = [
+            'fields' => [
+                [
+                    'fieldName' => 'id',
+                    'dataType' => 'Int64',
+                    'isPrimary' => true
+                ],
+                [
+                    'fieldName' => 'vector',
+                    'dataType' => 'FloatVector',
+                    'elementTypeParams' => [
+                        'dim' => '128'
+                    ]
+                ]
+            ]
+        ];
+        
+        Milvus::collection()->createCollection($collectionName, $schema);
+        
+        $response = Milvus::collection()->getCollectionStats($collectionName);
+        var_dump($response->body());
+        $this->assertIsArray($response->json());
+        $this->assertEquals(0, $response->json('code'));
+        $this->assertArrayHasKey('rowCount', $response->json('data'));
+        $this->assertIsInt($response->json('data.rowCount'));
+        
+        Milvus::collection()->dropCollection($collectionName);
+    }
 }
