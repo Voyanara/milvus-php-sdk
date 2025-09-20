@@ -30,6 +30,17 @@ You can install the package via Composer:
 composer require voyanara/milvus-php-sdk
 ```
 
+### Laravel Integration
+
+This package includes Laravel service provider for seamless integration:
+
+```bash
+# After installation, publish the configuration file
+php artisan milvus-php-sdk:install
+```
+
+This command will publish the configuration file to `config/milvus-php-sdk.php` where you can set your Milvus connection parameters.
+
 ## Roadmap
 
 ### ✅ Implemented Features
