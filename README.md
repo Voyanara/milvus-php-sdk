@@ -29,3 +29,24 @@ You can install the package via Composer:
 ```bash
 composer require voyanara/milvus-php-sdk
 ```
+
+## Roadmap
+
+### ✅ Implemented Features
+
+- **User Management** - Complete user operations (create, describe, drop, list, update password)
+- **Role Management** - Full role-based access control (create, drop, describe, list, grant/revoke privileges)
+
+### 🚧 In Development
+
+- **Collection Management** - Collection operations and schema management
+- **Vector Operations** - Insert, search, query, update, and delete vector data
+
+### 📋 Planned Features
+
+- **Alias Management** - Collection alias operations  
+- **Database Management** - Multi-database support
+- **Import Operations** - Bulk data import functionality
+- **Index Management** - Vector index creation and optimization
+- **Partition Management** - Data partitioning for better performance
+- **Resource Group** - Resource allocation and management
