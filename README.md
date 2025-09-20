@@ -21,3 +21,11 @@ Perfect for applications requiring vector similarity search, AI/ML workflows, an
 | Milvus Version | SDK Version |
 |----------------|-------------|
 | v2.6.x         | v1.0.x      |
+
+## Installation
+
+You can install the package via Composer:
+
+```bash
+composer require voyanara/milvus-php-sdk
+```
