@@ -23,6 +23,10 @@ Perfect for applications requiring vector similarity search, AI/ML workflows, an
 |----------------|-------------|
 | v2.6.x         | v1.0.x      |
 
+## Documentation
+
+- [Milvus REST API Reference](https://milvus.io/api-reference/restful/v2.6.x/About.md) - Official Milvus RESTful API documentation
+
 ## Installation
 
 You can install the package via Composer:
