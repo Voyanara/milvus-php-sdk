@@ -7,6 +7,7 @@ use Saloon\Http\Connector;
 use Voyanara\MilvusSdk\Endpoints\CollectionEndpoint;
 use Voyanara\MilvusSdk\Endpoints\RoleEndpoint;
 use Voyanara\MilvusSdk\Endpoints\UserEndpoint;
+use Voyanara\MilvusSdk\Endpoints\VectorEndpoint;
 
 class Milvus extends Connector
 {
@@ -46,5 +47,10 @@ class Milvus extends Connector
     public function collection(): CollectionEndpoint
     {
         return new CollectionEndpoint($this);
+    }
+
+    public function vector(): VectorEndpoint
+    {
+        return new VectorEndpoint($this);
     }
 }
