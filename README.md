@@ -23,6 +23,10 @@ Perfect for applications requiring vector similarity search, AI/ML workflows, an
 |----------------|-------------|
 | v2.6.x         | v1.0.x      |
 
+## Documentation
+
+- [Milvus REST API Reference](https://milvus.io/api-reference/restful/v2.6.x/About.md) - Official Milvus RESTful API documentation
+
 ## Installation
 
 You can install the package via Composer:
@@ -76,17 +80,17 @@ MILVUS_PORT=443
 - **User Management** - Complete user operations (create, describe, drop, list, update password)
 - **Role Management** - Full role-based access control (create, drop, describe, list, grant/revoke privileges)
 - **Collection Management** - Complete collection operations and schema management (create, drop, describe, list, load, release, rename, etc.)
+- **Vector Operations** - Complete vector data operations (insert, search, query, upsert, get, delete, hybrid search)
 
 ### 🚧 In Development
 
-- **Vector Operations** - Insert, search, query, update, and delete vector data
+- **Index Management** - Vector index creation and optimization
 
 ### 📋 Planned Features
 
 - **Alias Management** - Collection alias operations  
 - **Database Management** - Multi-database support
 - **Import Operations** - Bulk data import functionality
-- **Index Management** - Vector index creation and optimization
 - **Partition Management** - Data partitioning for better performance
 - **Resource Group** - Resource allocation and management
 
@@ -175,4 +179,243 @@ $indexParams = [
 ];
 
 Milvus::collection()->createCollection('my_collection', $schema, $indexParams);
+
+// Vector operations
+// Insert vector data
+$vectorData = [
+    [
+        'id' => 1,
+        'vector' => [0.1, 0.2, 0.3, 0.4, 0.5],
+        'metadata' => 'document1'
+    ],
+    [
+        'id' => 2, 
+        'vector' => [0.6, 0.7, 0.8, 0.9, 1.0],
+        'metadata' => 'document2'
+    ]
+];
+
+Milvus::vector()->insert('my_collection', $vectorData);
+
+// Search for similar vectors
+$queryVector = [[0.1, 0.2, 0.3, 0.4, 0.5]];
+$searchResults = Milvus::vector()->search(
+    collectionName: 'my_collection',
+    data: $queryVector,
+    annsField: 'vector',
+    limit: 10,
+    outputFields: ['id', 'metadata']
+);
+
+// Upsert (insert or update) vector data
+$upsertData = [
+    [
+        'id' => 1,
+        'vector' => [0.2, 0.3, 0.4, 0.5, 0.6], // Updated vector
+        'metadata' => 'document1_updated'
+    ]
+];
+
+Milvus::vector()->upsert('my_collection', $upsertData);
 ```
+
+## Vector Operations Examples
+
+### Vector Search
+
+Perform semantic search using vector embeddings:
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Milvus;
+
+// Initialize Milvus client
+$milvus = new Milvus(
+    token: 'root:Milvus',
+    host: 'http://localhost',
+    port: '19530'
+);
+
+// Prepare query vectors (can be multiple vectors)
+$queryVectors = [
+    [0.3580376395471989, -0.6023495712049978, 0.18414012509913835],
+    [0.19886812562848388, 0.06023560599112088, 0.6976963061752597]
+];
+
+// Basic vector search
+$response = $milvus->vector()->search(
+    collectionName: 'documents_collection',
+    data: $queryVectors,
+    annsField: 'content_vector',
+    limit: 5,
+    outputFields: ['id', 'title', 'category']
+);
+
+// Search with filtering
+$response = $milvus->vector()->search(
+    collectionName: 'documents_collection', 
+    data: $queryVectors,
+    annsField: 'content_vector',
+    filter: "category == 'technology' and publish_date >= '2024-01-01'",
+    limit: 10,
+    outputFields: ['id', 'title', 'content']
+);
+
+// Advanced search with custom parameters
+$searchParams = [
+    'metricType' => 'L2',
+    'params' => [
+        'radius' => 0.1,
+        'range_filter' => 0.9
+    ]
+];
+
+$response = $milvus->vector()->search(
+    collectionName: 'documents_collection',
+    data: $queryVectors,
+    annsField: 'content_vector', 
+    searchParams: $searchParams,
+    limit: 20,
+    offset: 10  // Pagination support
+);
+
+// Process results
+foreach ($response->json('data') as $result) {
+    echo "Document ID: {$result['id']}, Distance: {$result['distance']}\n";
+    echo "Title: {$result['title']}\n";
+}
+```
+
+### Vector Upsert
+
+Insert new vectors or update existing ones based on primary key:
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Milvus;
+
+// Initialize Milvus client
+$milvus = new Milvus(
+    token: 'root:Milvus',
+    host: 'http://localhost', 
+    port: '19530'
+);
+
+// Prepare document vectors for upsert
+$documents = [
+    [
+        'id' => 1,
+        'content_vector' => [0.1, 0.2, 0.3, 0.4, 0.5],
+        'title' => 'Introduction to AI',
+        'category' => 'technology',
+        'publish_date' => '2024-01-15'
+    ],
+    [
+        'id' => 2,
+        'content_vector' => [0.6, 0.7, 0.8, 0.9, 1.0], 
+        'title' => 'Machine Learning Basics',
+        'category' => 'technology',
+        'publish_date' => '2024-02-01'
+    ],
+    [
+        'id' => 3,
+        'content_vector' => [0.2, 0.4, 0.6, 0.8, 0.1],
+        'title' => 'Deep Learning Guide', 
+        'category' => 'technology',
+        'publish_date' => '2024-03-10'
+    ]
+];
+
+// Upsert documents (will insert new or update existing based on ID)
+$response = $milvus->vector()->upsert(
+    collectionName: 'documents_collection',
+    data: $documents
+);
+
+echo "Upserted {$response->json('data.upsertCount')} documents\n";
+print_r($response->json('data.upsertIds'));
+
+// Upsert to specific partition
+$response = $milvus->vector()->upsert(
+    collectionName: 'documents_collection',
+    data: $documents,
+    partitionName: 'tech_partition'
+);
+
+// Single document upsert
+$singleDocument = [
+    [
+        'id' => 100,
+        'content_vector' => [0.3, 0.1, 0.4, 0.7, 0.2],
+        'title' => 'Updated Document Title',
+        'category' => 'science'
+    ]
+];
+
+$milvus->vector()->upsert('documents_collection', $singleDocument);
+```
+
+## Creating a Milvus Collection
+
+Quick example of creating a collection with vector field:
+
+```php
+<?php
+
+use Voyanara\MilvusSdk\Milvus;
+
+// Initialize client
+$milvus = new Milvus(
+    token: 'root:Milvus',
+    host: 'http://localhost',
+    port: '19530'
+);
+
+// Define collection schema
+$schema = [
+    'fields' => [
+        [
+            'fieldName' => 'id',
+            'dataType' => 'Int64',
+            'isPrimary' => true
+        ],
+        [
+            'fieldName' => 'title',
+            'dataType' => 'VarChar',
+            'elementTypeParams' => ['max_length' => 200]
+        ],
+        [
+            'fieldName' => 'content_vector',
+            'dataType' => 'FloatVector',
+            'elementTypeParams' => ['dim' => 768] // 768-dimensional vectors
+        ]
+    ]
+];
+
+// Define vector index
+$indexParams = [
+    [
+        'fieldName' => 'content_vector',
+        'indexName' => 'content_vector_index',
+        'metricType' => 'L2'
+    ]
+];
+
+// Create collection
+$response = $milvus->collection()->createCollection(
+    collectionName: 'my_documents',
+    schema: $schema,
+    indexParams: $indexParams
+);
+
+// Load collection into memory for operations
+$milvus->collection()->loadCollection('my_documents');
+
+echo "Collection 'my_documents' created successfully!\n";
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
